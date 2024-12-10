@@ -1,3 +1,4 @@
+InfamyManager.VERSION = 4
 function InfamyManager:get_infamy_card_id_and_rect()
 	local texture_id = "guis/textures/pd2/skilltree/ace"
 	local texture_rect = {
