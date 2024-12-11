@@ -771,23 +771,27 @@ function InfamyTreeGui:_setup()
 		w = card_w,
 		h = card_h
 	})
-	local card_bitmap = card_panel:bitmap({
+	local card_bitmap = {
 		layer = 2,
-		w = card_panel:w(),
-		h = card_panel:h(),
+		w = card_panel:w() - 4,
+		h = card_panel:h() - 4,
 		texture = card_id,
 		texture_rect = card_rect
-	})
+	}
 	
-	local infamy_card_display = DB:has(Idstring("texture"), "guis/dlcs/infamous/textures/pd2/infamous_tree/infamy_card_display")
+	card_panel:bitmap(card_bitmap)
+	card_bitmap.texture_rect[4] = 34
+	card_bitmap.h = card_bitmap.h - 6
+	card_panel:bitmap(card_bitmap)
+	
 	card_panel:text({
 		vertical = "center",
 		align = "center",
 		layer = 3,
 		text = tostring(managers.experience:current_rank()),
 		font = FONT_LARGE,
-		font_size = infamy_card_display and FONT_SIZE_LARGE or 30,
-		color = infamy_card_display and Color.black or Color.white
+		font_size = FONT_SIZE_LARGE,
+		color = Color.black
 	})
 
 	local error_string = ""
