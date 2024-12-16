@@ -1,5 +1,9 @@
--- require("lib/managers/menu/ExtendedUiElemets")
--- require("lib/managers/menu/WalletGuiObject")
+Hooks:PostHook(MenuComponentManager, "mouse_released", "INF4_infamytree_gui_mouse_released", function(self, o, button, x, y)
+	if self._infamytree_gui and self._infamytree_gui:mouse_released(o, button, x, y) then
+		return true
+	end
+end)
+
 ListItem = ListItem or class(ExtendedPanel)
 
 function ListItem:init(...)
@@ -69,8 +73,9 @@ function InfamyTreeItem:setup_content_panel()
 	self._content_panel:clear()
 
 	local margin = 10
-	self.locked = not managers.infamy:owned(self.data.tier_id) and managers.experience:current_rank() < self.data.rank_requirement
-	self.can_unlock = not managers.infamy:owned(self.data.tier_id) and self.data.rank_requirement <= managers.experience:current_rank()
+	local rank_requirement_with_check = self.data.rank_requirement < 6 and managers.experience:current_rank() ~= 1 and 2 or self.data.rank_requirement
+	self.locked = not managers.infamy:owned(self.data.tier_id) and managers.experience:current_rank() < rank_requirement_with_check
+	self.can_unlock = not managers.infamy:owned(self.data.tier_id) and rank_requirement_with_check <= managers.experience:current_rank()
 
 	if self.locked and not self.can_unlock then
 		self.name_id = "menu_infamy_box_title"
@@ -117,14 +122,13 @@ function InfamyTreeItem:setup_content_panel()
 	ExtendedPanel.make_fine_text(number_text)
 	number_text:set_center_x(self._content_panel:w() / 2)
 	number_text:set_bottom(self._content_panel:bottom() - margin)
-
-	if self.data.rank_requirement <= managers.experience:current_rank() then
-
+	
+	if rank_requirement_with_check <= managers.experience:current_rank() then
 		local item_height = 4
-		local color = tweak_data.screen_colors.resource
+		local color = tweak_data.screen_colors.resource:with_alpha(0.65)
 		local connector_df = "guis/textures/pd2/skilltree/dottedline"
-		local spinner_01_df = "guis/textures/pd2/hud_progress_active"
-		local spinner_02_df = "guis/textures/pd2/skilltree/ace"
+		local spinner_01_df = "guis/textures/pd2/particles/fill"
+		local spinner_02_df = "guis/textures/pd2/particles/fill"
 		
 		if DB:has(Idstring("texture"), "guis/dlcs/infamous/textures/pd2/infamous_tree/connector_df") then
 			color = Color.white
@@ -133,8 +137,8 @@ function InfamyTreeItem:setup_content_panel()
 			spinner_01_df = "guis/dlcs/infamous/textures/pd2/infamous_tree/spinner_01_df"
 			spinner_02_df = "guis/dlcs/infamous/textures/pd2/infamous_tree/spinner_02_df"
 		end
-	
-		local at_level = self:is_current_unlockable() and 0.5 or 1
+		
+		local at_level = self.data.rank_requirement > managers.experience:current_rank() and 0 or self:is_current_unlockable() and 0.5 or 1
 		local line_panel = self._content_panel:panel()
 		local line_image = line_panel:bitmap({
 			blend_mode = "add",
@@ -160,26 +164,26 @@ function InfamyTreeItem:setup_content_panel()
 		local glow1 = glow_panel:bitmap({
 			texture = spinner_01_df,
 			name = "glow1",
-			layer = 5,
+			layer = 8,
 			blend_mode = "add",
 			halign = "scale",
 			rotation = 360,
 			valign = "scale",
 			w = glow_size,
 			h = glow_size,
-			color = tweak_data.screen_colors.text
+			color = color
 		})
 		local glow2 = glow_panel:bitmap({
 			texture = spinner_02_df,
 			name = "glow2",
-			layer = 5,
+			layer = 8,
 			blend_mode = "add",
 			halign = "scale",
 			rotation = 360,
 			valign = "scale",
 			w = glow_size,
 			h = glow_size,
-			color = tweak_data.screen_colors.text
+			color = color
 		})
 
 		self._content_panel:animate(function ()
@@ -252,15 +256,25 @@ function InfamyTreeItem:get_item_texture_and_rect()
 		texture_id = "guis/"
 		local bundle_folder = td.texture_bundle_folder
 
-		if bundle_folder then
-			texture_id = texture_id .. "dlcs/" .. tostring(bundle_folder) .. "/"
+		if category_id == "weapon_mods" then
+			texture_id = "guis/textures/pd2/lootscreen/loot_cards"
+			texture_rect = {256, 0, 128, 180}
+		elseif category_id == "textures" then
+			texture_id = "guis/textures/pd2/lootscreen/loot_cards"
+			texture_rect = {384, 180, 128, 180}
+		elseif category_id == "material" then
+			texture_id = "guis/textures/pd2/lootscreen/loot_cards"
+			texture_rect = {128, 180, 128, 180}
+		elseif category_id == "colors" then
+			texture_id = "guis/textures/pd2/lootscreen/loot_cards"
+			texture_rect = {256, 180, 128, 180}
+		else
+			if bundle_folder then
+				texture_id = texture_id .. "dlcs/" .. tostring(bundle_folder) .. "/"
+			end
+			
+			texture_id = texture_id .. "textures/pd2/blackmarket/icons/" .. category_id .. "/" .. item_id
 		end
-
-		if category_id == "weapon_skins" then
-			category_id = "weapon_color"
-		end
-
-		texture_id = texture_id .. "textures/pd2/blackmarket/icons/" .. category_id .. "/" .. item_id
 	else
 		local xy = (self.locked or self.can_unlock) and {
 			2,
@@ -268,14 +282,14 @@ function InfamyTreeItem:get_item_texture_and_rect()
 		} or self.data.tier_data.icon_xy
 		local texture_rect_x = xy and xy[1] or 2
 		local texture_rect_y = xy and xy[2] or 2
-		texture_id = "guis/dlcs/infamous/textures/pd2/infamous_tree/infamous_tree_atlas"
+		texture_id = "guis/textures/pd2/lootscreen/loot_cards"
 		texture_rect = {
-			texture_rect_x * 128,
-			texture_rect_y * 128,
+			0,
+			0,
 			128,
-			128
+			180
 		}
-		blend_mode = "add"
+		blend_mode = "normal"
 	end
 
 	if not DB:has(Idstring("texture"), texture_id) then
@@ -307,7 +321,7 @@ function InfamyTreeItem:is_current_unlockable()
 end
 
 function InfamyTreeItem:is_open()
-	return not self.locked and not self.can_unlock
+	return not self.locked
 end
 
 function InfamyTreeItem:get_infamy_item()
@@ -321,7 +335,7 @@ end
 function InfamyTreeItem:is_previewable()
 	local tdu = self:get_infamy_upgrades()
 
-	return tdu and tdu[1] and tdu[1][2] and (tdu[1][2] == "masks" or tdu[1][2] == "weapon_skins" or tdu[1][2] == "gloves" or tdu[1][2] == "player_styles")
+	return tdu and tdu[1] and tdu[1][2] and (tdu[1][2] == "masks" or tdu[1][2] == "weapon_mods" or tdu[1][2] == "materials" or tdu[1][2] == "textures" or tdu[1][2] == "colors")
 end
 
 function InfamyTreeItem:get_previewable_id()
@@ -624,7 +638,7 @@ function InfamyTreeGui:_setup()
 		h = self.infamous_panel:h() - infamy_panel_top:bottom() - 10,
 		w = self.infamous_panel:w() - 10
 	})
-	local is_level_cap = managers.experience:reached_level_cap()
+	local is_level_cap = managers.experience:current_level() >= managers.experience:level_cap()
 	local reputation_progress_panel = infamy_subpanel_top_left:panel({
 		x = 5,
 		y = 5,
@@ -979,8 +993,8 @@ function InfamyTreeGui:update_detail_panels()
 
 	self.main_display_panel:clear()
 	self.detail_panel_content:clear()
-
-	if item.data.rank_requirement and managers.experience:current_rank() < item.data.rank_requirement then
+	local rank_requirement = item.data.rank_requirement and (managers.experience:current_rank() < item.data.rank_requirement or managers.experience:current_rank() ~= 1 and item.data.rank_requirement < 6)
+	if rank_requirement then
 		local overlap_panel = self.main_display_panel:panel({
 			layer = 2,
 			h = self.main_display_panel:h() / 6
@@ -1033,12 +1047,30 @@ function InfamyTreeGui:update_detail_panels()
 		wrap = true,
 		word_wrap = true,
 		layer = 5,
-		text = managers.localization:text(item.desc_id, desc_params),
+		text = "",
 		font_size = FONT_SIZE,
 		font = FONT,
 		color = TEXT_COLOR
 	})
+	
+	if type(item.desc_id) == "table" then
+		local description = ""
+		for _, id in pairs(item.desc_id) do
+			description = description .. managers.localization:text(id, desc_params) .. "\n\n"
+		end
+		detail_desc:set_text(description)
+	else
+		detail_desc:set_text(managers.localization:text(item.desc_id, desc_params))
+	end
 
+	local _, _, w, h = detail_desc:text_rect()
+
+	while self.detail_panel_content:h() / 1.9 < detail_desc:bottom() do
+		detail_desc:set_font_size(detail_desc:font_size() * 0.99)
+		ExtendedPanel.make_fine_text(detail_desc)
+		_, _, w, h = detail_desc:text_rect()
+	end
+	
 	detail_desc:set_w(self.detail_panel_content:w() - margin * 2)
 	detail_desc:set_top(detail_title:bottom())
 	detail_desc:set_left(margin)
@@ -1108,19 +1140,25 @@ function InfamyTreeGui:update_detail_panels()
 					colors_panel:bitmap({
 						texture = "guis/textures/pd2/blackmarket/icons/colors/color_bg",
 						layer = 2,
-						name = item_id .. "_color_bg"
+						name = item_id .. "_color_bg",
+						w = icon_size,
+						h = icon_size
 					})
 					colors_panel:bitmap({
 						texture = "guis/textures/pd2/blackmarket/icons/colors/color_02",
 						layer = 1,
 						name = item_id .. "_color_1",
-						color = tweak_data.blackmarket.colors[item_id].colors[1]
+						color = tweak_data.blackmarket.colors[item_id].colors[1],
+						w = icon_size,
+						h = icon_size
 					})
 					colors_panel:bitmap({
 						texture = "guis/textures/pd2/blackmarket/icons/colors/color_01",
 						layer = 1,
 						name = item_id .. "_color_2",
-						color = tweak_data.blackmarket.colors[item_id].colors[2]
+						color = tweak_data.blackmarket.colors[item_id].colors[2],
+						w = icon_size,
+						h = icon_size
 					})
 				elseif category == "textures" then
 					local icon_texture = tweak_data.blackmarket.textures[item_id].texture
@@ -1243,7 +1281,7 @@ function InfamyTreeGui:item_clicked(item)
 end
 
 function InfamyTreeGui:unlock_infamy_item(item)
-	if item.can_unlock and not managers.infamy:owned(item.data.tier_id) then
+	if managers.infamy:points() > 0 and item.can_unlock and not managers.infamy:owned(item.data.tier_id) then
 		managers.infamy:unlock_item(item.data.tier_id)
 		item:setup_content_panel()
 
@@ -1639,7 +1677,16 @@ function InfamyTreeGui:_update_description(name, unlocked)
 
 		desc_title:set_text(title_text)
 		desc_warning:set_text(unlocked and "" or utf8.to_upper(managers.localization:text("menu_infamy_unlock_prev_tier")))
-		desc_text:set_text(managers.localization:text(infamy_tweak.desc_id, params))
+		if type(infamy_tweak.desc_id) == "table" then
+			local description = ""
+			for _, id in pairs(infamy_tweak.desc_id) do
+				description = description .. managers.localization:text(id, desc_params) .. "\n\n"
+			end
+			desc_text:set_text(description)
+		else
+			desc_text:set_text(managers.localization:text(infamy_tweak.desc_id, params))
+		end
+		
 		managers.menu_component:add_colors_to_text_object(desc_text, tweak_data.screen_colors.resource)
 	else
 		desc_title:set_text(utf8.to_upper(managers.localization:text("st_menu_infamy_secret")))
