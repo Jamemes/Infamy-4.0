@@ -330,7 +330,12 @@ function MenuCallbackHandler:_increase_infamous(yes_clbk)
 		managers.money:deduct_from_offshore(offshore_cost)
 	end
 
-	managers.skilltree:reset()
+	if managers.skilltree.infamy_reset then
+		managers.skilltree:infamy_reset()
+	else
+		managers.skilltree:reset()
+	end
+
 	managers.blackmarket:reset_equipped()
 
 	if managers.menu_component then

@@ -2,7 +2,7 @@
 	"name": "Infamy 4.0",
 	"description": "TweakData Browser.",
 	"author": "James",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"priority" : 1,
 	"hooks": [
 		{"hook_id": "lib/managers/menumanager",						"script_path": "menumanager.lua"},
