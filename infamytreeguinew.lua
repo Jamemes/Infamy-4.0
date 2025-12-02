@@ -1,4 +1,4 @@
-Hooks:PostHook(MenuComponentManager, "mouse_released", "INF4_infamytree_gui_mouse_released", function(self, o, button, x, y)
+Hooks:PostHook(MenuComponentManager, "mouse_released", "INF4.MenuComponentManager.mouse_released", function(self, o, button, x, y)
 	if self._infamytree_gui and self._infamytree_gui:mouse_released(o, button, x, y) then
 		return true
 	end

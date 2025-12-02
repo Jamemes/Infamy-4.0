@@ -7,11 +7,11 @@ function ExperienceManager:prestige_availible()
 end
 
 function ExperienceManager:set_current_prestige_xp(value)
-	self._global.prestige_xp_gained = Application:digest_value(math.min(value, self:get_max_prestige_xp()), true)
+	Global.infamy_manager.unlocks.prestige_xp_gained = Application:digest_value(math.min(value, self:get_max_prestige_xp()), true)
 end
 
 function ExperienceManager:get_current_prestige_xp()
-	return self._global.prestige_xp_gained and Application:digest_value(self._global.prestige_xp_gained, false) or 0
+	return Global.infamy_manager.unlocks.prestige_xp_gained and Application:digest_value(Global.infamy_manager.unlocks.prestige_xp_gained, false) or 0
 end
 
 function ExperienceManager:get_max_prestige_xp()
@@ -110,19 +110,8 @@ function ExperienceManager:rank_string(rank, use_roman_numerals)
 	return roman
 end
 
-Hooks:PreHook(ExperienceManager, "add_points", "INF4_add_prestige_xp_gained", function(self, points)
+Hooks:PreHook(ExperienceManager, "add_points", "INF4.ExperienceManager.add_points", function(self, points)
 	if self:prestige_availible() then
 		self:set_current_prestige_xp(self:get_current_prestige_xp() + points)
-	end
-end)
-
-Hooks:PostHook(ExperienceManager, "save", "INF4_save_prestige_xp_gained", function(self, data)
-	data.ExperienceManager.prestige_xp_gained = self._global.prestige_xp_gained
-end)
-
-Hooks:PostHook(ExperienceManager, "load", "INF4_load_prestige_xp_gained", function(self, data)
-	local state = data.ExperienceManager
-	if state then
-		self._global.prestige_xp_gained = state.prestige_xp_gained or Application:digest_value(0, true)
 	end
 end)
