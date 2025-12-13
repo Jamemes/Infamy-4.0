@@ -1,3 +1,50 @@
+if type(MenuComponentManager.make_color_text) == "nil" then
+	function MenuComponentManager:make_color_text(text_object, color)
+		local text = text_object:text()
+		local text_dissected = utf8.characters(text)
+		local idsp = Idstring("#")
+		local start_ci = {}
+		local end_ci = {}
+		local first_ci = true
+
+		for i, c in ipairs(text_dissected) do
+			if Idstring(c) == idsp then
+				local next_c = text_dissected[i + 1]
+
+				if next_c and Idstring(next_c) == idsp then
+					if first_ci then
+						table.insert(start_ci, i)
+					else
+						table.insert(end_ci, i)
+					end
+
+					first_ci = not first_ci
+				end
+			end
+		end
+
+		if #start_ci == #end_ci then
+			for i = 1, #start_ci do
+				start_ci[i] = start_ci[i] - ((i - 1) * 4 + 1)
+				end_ci[i] = end_ci[i] - (i * 4 - 1)
+			end
+		end
+
+		text = string.gsub(text, "##", "")
+
+		text_object:set_text(text)
+		text_object:clear_range_color(1, utf8.len(text))
+
+		if #start_ci ~= #end_ci then
+			Application:error("CrimeNetGui:make_color_text: Not even amount of ##'s in text", #start_ci, #end_ci)
+		else
+			for i = 1, #start_ci do
+				text_object:set_range_color(start_ci[i], end_ci[i], color or tweak_data.screen_colors.resource)
+			end
+		end
+	end
+end
+
 Hooks:PostHook(MenuComponentManager, "mouse_released", "INF4.MenuComponentManager.mouse_released", function(self, o, button, x, y)
 	if self._infamytree_gui and self._infamytree_gui:mouse_released(o, button, x, y) then
 		return true

@@ -2,7 +2,7 @@
 	"name": "Infamy 4.0",
 	"description": "Infamy 4.0.",
 	"author": "James",
-	"version": "2",
+	"version": "2.1",
 	"priority" : 1,
 	"hooks": [
 		{"hook_id": "lib/managers/menumanager",						"script_path": "menumanager.lua"},

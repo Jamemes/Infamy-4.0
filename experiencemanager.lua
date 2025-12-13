@@ -1,3 +1,23 @@
+if type(ExperienceManager.get_levels_gained_from_xp) == "nil" then
+	function ExperienceManager:get_levels_gained_from_xp(xp)
+		local next_level_data = self:next_level_data()
+		local xp_needed_to_level = math.max(1, next_level_data.points - next_level_data.current_points)
+		local level_gained = math.min(xp / xp_needed_to_level, 1)
+		xp = math.max(xp - xp_needed_to_level, 0)
+		local plvl = managers.experience:current_level() + 1
+		local level_data = nil
+
+		while xp > 0 and plvl < self._total_levels do
+			plvl = plvl + 1
+			xp_needed_to_level = tweak_data:get_value("experience_manager", "levels", plvl, "points")
+			level_gained = level_gained + math.min(xp / xp_needed_to_level, 1)
+			xp = math.max(xp - xp_needed_to_level, 0)
+		end
+
+		return level_gained
+	end
+end
+
 function math.inverse_lerp(a, b, v)
 	return (v - a) / (b - a)
 end
