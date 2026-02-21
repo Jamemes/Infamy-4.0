@@ -15,6 +15,7 @@ Hooks:Add("LocalizationManagerPostInit", "INF4.LocalizationManagerPostInit", fun
 		menu_infamy_go_infamous_error_level = "You need to be level 100 to go infamous",
 		menu_infamy_banner_already_unlocked = "Item rewards have already been unlocked.\nExperience boost will be unlocked at Infamy rank $rank;",
 		menu_infamy_desc_xp = "Experience gained is increased by ##$xpboost;##.",
+		menu_infamy_go_infamous_error_money = "You need to pay 200,000,000 from your offshore account to go infamous.",
 	})
 
 	if Idstring("russian"):key() == SystemInfo:language():key() then
@@ -34,6 +35,7 @@ Hooks:Add("LocalizationManagerPostInit", "INF4.LocalizationManagerPostInit", fun
 			menu_infamy_go_infamous_error_level = [[Вам нужен 100-ый уровень, чтобы получить ранг Бесславия.]],
 			menu_infamy_banner_already_unlocked = [[Предметы уже были разблокированы\nБонус к получаемому опыту будет разблокирован на $rank; ранге Бесславия.]],
 			menu_infamy_desc_xp = [[Количество получаемого опыта увеличено на ##$xpboost;##.]],
+			menu_infamy_go_infamous_error_money = "Вам нужно заплатить 200,000,000 с вашего оффшорного счёта, чтобы получить ранг Бесславия.",
 		})
 	end
 end)

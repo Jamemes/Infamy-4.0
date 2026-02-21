@@ -58,8 +58,12 @@ Hooks:PostHook(HUDStatsScreen, "_create_stats_screen_profile", "INF4.HUDStatsScr
 		infamy_pool_gain_ring:rotate(360 * prestige_xp)
 		infamy_pool_gain_ring:set_center(exp_ring:center())
 	end
-	
-	local exp_ring_purple = DB:has(Idstring("texture"), Idstring("guis/textures/pd2/exp_ring_purple")) and "guis/textures/pd2/exp_ring_purple" or "guis/textures/pd2/hud_progress_active"
+
+	local exp_ring_purple = "guis/textures/pd2/hud_progress_active"
+	if (blt and blt.db_create_entry) or (DB and DB.create_entry) then
+		exp_ring_purple = "guis/textures/pd2/exp_ring_purple"
+	end
+
 	local exp_gain_ring = profile_wrapper_panel:bitmap({
 		texture = at_max_level and exp_ring_purple or "guis/textures/pd2/level_ring_potential_small",
 		h = h,
@@ -111,36 +115,34 @@ Hooks:PostHook(HUDStatsScreen, "_create_stats_screen_profile", "INF4.HUDStatsScr
 		})
 		
 		local points = next_level_data.points - next_level_data.current_points
-		local calc_prestige_xp_left = exp_left_to_fill_the_pool - gain_xp
-		local prestige_xp_left = calc_prestige_xp_left > 0 and calc_prestige_xp_left or 0
+		local prestige_xp_left = exp_left_to_fill_the_pool > 0 and exp_left_to_fill_the_pool or 0
 		
-		local points_left = " ##"..managers.money:add_decimal_marks_to_string(tostring(at_max_level and prestige_xp_left or points)).."##"
-		next_level_in:set_text(managers.localization:to_upper_text("menu_es_next_level") .. points_left)
-		managers.menu_component:make_color_text(next_level_in, at_max_level and tweak_data.screen_colors.infamy_color or tweak_data.screen_colors.text)
+		local points_left = managers.money:add_decimal_marks_to_string(tostring(at_max_level and prestige_xp_left or points))
+		next_level_in:set_text("##" .. managers.localization:to_upper_text("menu_es_next_level") .. "## " .. points_left)
+		managers.menu_component:make_color_text(next_level_in, tweak_data.screen_colors.text:with_alpha(0.55))
 		managers.hud:make_fine_text(next_level_in)
 		next_level_in:set_left(math.round(exp_ring:right() + 4))
 		next_level_in:set_center_y(math.round(exp_ring:center_y()) - 20)
 
 		local text = managers.localization:to_upper_text("hud_potential_xp", {
-			XP = managers.money:add_decimal_marks_to_string(tostring(gain_xp))
+			XP = "##" .. managers.money:add_decimal_marks_to_string(tostring(gain_xp)) .. "##"
 		})
 		local gain_xp_text = profile_wrapper_panel:text({
 			name = "gain_xp_text",
 			text = text,
 			font_size = tweak_data.menu.pd2_small_font_size,
 			font = tweak_data.menu.pd2_small_font,
-			color = tweak_data.hud_stats.potential_xp_color
+			color = tweak_data.screen_colors.text:with_alpha(0.55)
 		})
 
 		managers.hud:make_fine_text(gain_xp_text)
 		gain_xp_text:set_left(math.round(exp_ring:right() + 4))
 		gain_xp_text:set_center_y(math.round(exp_ring:center_y()) + 0)
+		managers.menu_component:make_color_text(gain_xp_text, tweak_data.hud_stats.potential_xp_color)
 
 		local level_ups = math.floor(managers.experience:get_levels_gained_from_xp(gain_xp))
-		local plus = (prestige_xp + gain_infamy_pool_progress) * 100
-		local pool_progress = math.floor(plus) >= 100 and "##(".. 100 .. "%)##" or math.floor(plus) > prestige_xp * 100 and "##(".. math.floor(plus) .. "%)##" or ""
-		local above = at_max_level and managers.localization:to_upper_text("menu_infamy_infamy_panel_prestige_level") .. " " .. managers.money:add_decimal_marks_to_string(tostring(managers.experience:get_current_prestige_xp()))
-		local below = can_lvl_up and managers.localization:to_upper_text("hud_potential_level_up"):gsub("!", "") ..": ".. level_ups .. "!" or ""
+		local above = at_max_level and "##" .. managers.localization:to_upper_text("menu_infamy_infamy_panel_prestige_level") .. "## " .. managers.money:add_decimal_marks_to_string(tostring(managers.experience:get_current_prestige_xp()))
+		local below = can_lvl_up and "##" .. managers.localization:to_upper_text("hud_potential_level_up"):gsub("!", "") ..":## ".. level_ups .. "!" or ""
 		
 		local potential_level_up_text = profile_wrapper_panel:text({
 			vertical = "center",
@@ -156,7 +158,7 @@ Hooks:PostHook(HUDStatsScreen, "_create_stats_screen_profile", "INF4.HUDStatsScr
 
 		potential_level_up_text:set_text(above or below or "")
 		potential_level_up_text:set_color(at_max_level and tweak_data.screen_colors.infamy_color or tweak_data.hud_stats.potential_xp_color)
-		managers.menu_component:make_color_text(potential_level_up_text, tweak_data.hud_stats.potential_xp_color)
+		managers.menu_component:make_color_text(potential_level_up_text, tweak_data.screen_colors.text:with_alpha(0.55))
 		
 		managers.hud:make_fine_text(potential_level_up_text)
 		potential_level_up_text:set_left(math.round(exp_ring:right() + 4))

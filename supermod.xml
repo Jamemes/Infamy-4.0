@@ -1,0 +1,10 @@
+﻿<?xml version="1.0"?>
+<mod>
+	<assets base_path="assets/">
+		<group>
+			<group name="guis/">
+				<file :name="textures/pd2/exp_ring_purple.texture"/>
+			</group>
+		</group>
+	</assets>
+</mod>

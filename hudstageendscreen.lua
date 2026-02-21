@@ -36,7 +36,13 @@ Hooks:PostHook(HUDStageEndScreen, "update", "INF4.HUDStageEndScreen.update", fun
 				self._lp_forepanel:child("level_progress_text"):set_text(managers.localization:to_upper_text("menu_infamy_infamy_panel_prestige_level"))
 				self._lp_forepanel:child("level_progress_text"):set_w(2000)
 				self._lp_backpanel:child("bg_progress_circle"):set_color(tweak_data.screen_colors.text)
-				self._lp_circle:set_image(DB:has(Idstring("texture"), Idstring("guis/textures/pd2/exp_ring_purple")) and "guis/textures/pd2/exp_ring_purple" or "guis/textures/pd2/hud_progress_active")
+
+				local lp_circle_image = "guis/textures/pd2/hud_progress_active"
+				if (blt and blt.db_create_entry) or (DB and DB.create_entry) then
+					lp_circle_image = "guis/textures/pd2/exp_ring_purple"
+				end
+
+				self._lp_circle:set_image(lp_circle_image)
 				self._lp_circle_changed_to_prestige = true
 			end
 			

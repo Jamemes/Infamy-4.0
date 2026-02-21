@@ -22,7 +22,7 @@ Hooks:PostHook(PlayerProfileGuiObject, "init", "INF4.PlayerProfileGuiObject.init
 		local lvl_circle_bg = self._panel:child(0)
 		lvl_circle_bg:set_color(tweak_data.screen_colors.text)
 		lvl_circle_bg:set_alpha(1)
-		if DB:has(Idstring("texture"), Idstring("guis/textures/pd2/exp_ring_purple")) then
+		if (blt and blt.db_create_entry) or (DB and DB.create_entry) then
 			lvl_circle:set_image("guis/textures/pd2/exp_ring_purple")
 			lvl_circle:set_size(lvl_circle_bg:h() + 7, lvl_circle_bg:w() + 7)
 		else
