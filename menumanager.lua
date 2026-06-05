@@ -227,3 +227,12 @@ end
 function MenuCallbackHandler:can_become_infamous()
 	return false
 end
+
+Hooks:PostHook(MenuManager, "on_leave_lobby", "INF4.MenuManager.on_leave_lobby.remove_infamy_card_guis", function(self)
+	for name, card_gui in pairs(managers.menu_scene._card_guis or {}) do
+		if name ~= "menu_character" then
+			card_gui:destroy()
+			managers.menu_scene._card_guis[name] = nil
+		end
+	end
+end)

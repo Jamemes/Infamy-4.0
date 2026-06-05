@@ -1144,10 +1144,10 @@ function InfamyTreeGui:update_detail_panels()
 				item_amount = item_amount + 1
 			end
 		end
-
 		local x_pos_increment = (desc_upgrade:w() + 100) / (item_amount + 1)
 		local x = x_pos_increment - 50
-		local icon_size = 64
+		local scale = math.max(1, 0.5 * item_amount)
+		local icon_size = 64 / scale
 		local y_pos = desc_upgrade:h() - icon_size - 10
 
 		for bonus, item in ipairs(infamy_tweak.upgrades) do
