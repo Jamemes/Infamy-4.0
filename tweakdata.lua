@@ -46,11 +46,13 @@ for index, item_type in pairs(reward_type) do
 	for id, item in pairs(tweak_data.blackmarket[item_type]) do
 		if not item.dlc and item.pcs and #item.pcs > 0 and item.value > 0 then
 			local value = tweak_data.blackmarket[item_type][id].infamous and item.value + 100 or item.value
-			table.insert(items, {value, {
-				tweak_data.blackmarket[item_type][id].infamous and "infamy" or tweak_data.blackmarket[item_type][id].global_value,
-				item_type,
-				id
-			}})
+			if item_type == "weapon_mods" or tweak_data.blackmarket[item_type][id].infamous then
+				table.insert(items, {value, {
+					tweak_data.blackmarket[item_type][id].infamous and "infamy" or tweak_data.blackmarket[item_type][id].global_value,
+					item_type,
+					id
+				}})
+			end
 		end
 	end
 	
@@ -60,7 +62,7 @@ for index, item_type in pairs(reward_type) do
 
 	local min = 0
 	for i = 1, #items do
-		if tbl[i] and #tbl[i] >= 5 then
+		if tbl[i] and #tbl[i] >= 3 then
 			min = min + 1
 		end
 	end
@@ -71,6 +73,12 @@ for index, item_type in pairs(reward_type) do
 		end
 		
 		table.insert(tbl[i + min], items[i][2])
+		
+		if item_type == "weapon_mods" then
+			if #tbl[i + min] < 3 then
+				min = min - 1
+			end
+		end
 	end	
 end
 
