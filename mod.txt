@@ -2,7 +2,7 @@
 	"name": "Infamy 4.0",
 	"description": "Infamy 4.0.",
 	"author": "James",
-	"version": "2.2",
+	"version": "3",
 	"priority" : 1,
 	"hooks": [
 		{"hook_id": "lib/network/base/handlers/connectionnetworkhandler",	"script_path": "connectionnetworkhandler.lua"},
