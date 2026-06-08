@@ -39,14 +39,14 @@ if tweak_data.infamy.items.infamy_maskpack_balaclava then
 	}
 end
 
-local reward_type = {"masks", "textures", "materials", "colors"}
+local reward_type = {"masks", "textures", "materials", "colors", "weapon_mods"}
 local tbl = {}
 for index, item_type in pairs(reward_type) do
 	local items = {}
 	for id, item in pairs(tweak_data.blackmarket[item_type]) do
 		if not item.dlc and item.pcs and #item.pcs > 0 and item.value > 0 then
 			local value = tweak_data.blackmarket[item_type][id].infamous and item.value + 100 or item.value
-			if tweak_data.blackmarket[item_type][id].infamous then
+			if item_type == "weapon_mods" or tweak_data.blackmarket[item_type][id].infamous then
 				table.insert(items, {value, {
 					tweak_data.blackmarket[item_type][id].infamous and "infamy" or tweak_data.blackmarket[item_type][id].global_value,
 					item_type,
@@ -73,6 +73,12 @@ for index, item_type in pairs(reward_type) do
 		end
 		
 		table.insert(tbl[i + min], items[i][2])
+		
+		if item_type == "weapon_mods" then
+			if #tbl[i + min] < 3 then
+				min = min - 1
+			end
+		end
 	end	
 end
 
@@ -102,6 +108,7 @@ for i = 1, #tbl do
 	params.upgrades = tbl[i]
 
 	if #tweak_data.infamy.tree <= 25 then
+		tweak_data.infamy.infamy_1 = true
 		params.desc_id = {params.desc_id, "menu_infamy_desc_xp"}
 		params.desc_params = {xpboost = "10%"}
 		params.upgrades.infamous_xp = 1.1
@@ -114,3 +121,93 @@ end
 for i = 0, #tweak_data.infamy.tree do
 	table.insert(tweak_data.infamy.statistics_rank_steps, 1, i)
 end
+
+
+local infamy_icons = {
+	{
+		hud_icon = "infamy_icon_1",
+		color = Color("000000")
+	},
+	{
+		hud_icon = "infamy_icon_2",
+		color = Color("B8000A")
+	},
+	{
+		hud_icon = "infamy_icon_3",
+		color = Color("000000")
+	},
+	{
+		hud_icon = "infamy_icon_4",
+		color = Color("B8000A")
+	},
+	{
+		hud_icon = "infamy_icon_5",
+		color = Color("FFD700")
+	}
+}
+
+tweak_data.infamy.rank_icon = function(self, rank)
+	if rank and rank > 0 then
+		local index = math.floor(rank / 100) + 1
+		return (infamy_icons[index] or infamy_icons[rank > 100 and 5 or 1]).hud_icon
+	end
+end
+
+tweak_data.infamy.rank_icon_data = function(self, rank)
+	local icon = tweak_data.hud_icons[self:rank_icon(rank)]
+	return icon.texture, icon.texture_rect
+end
+
+tweak_data.infamy.rank_icon_color = function(self, rank)
+	if rank and rank > 0 then
+		local index = math.floor(rank / 100) + 1
+
+		return (infamy_icons[index] or infamy_icons[rank > 100 and 5 or 1]).color
+	end
+end
+
+tweak_data.hud_icons.infamy_icon_1 = {
+	texture = "guis/textures/pd2/infamous_symbol2",
+	texture_rect = {
+		32,
+		4,
+		16,
+		16
+	}
+}
+tweak_data.hud_icons.infamy_icon_2 = {
+	texture = "guis/textures/pd2/infamous_symbol2",
+	texture_rect = {
+		48,
+		4,
+		16,
+		16
+	}
+}
+tweak_data.hud_icons.infamy_icon_3 = {
+	texture = "guis/textures/pd2/infamous_symbol2",
+	texture_rect = {
+		0,
+		4,
+		16,
+		16
+	}
+}
+tweak_data.hud_icons.infamy_icon_4 = {
+	texture = "guis/textures/pd2/infamous_symbol2",
+	texture_rect = {
+		16,
+		4,
+		16,
+		16
+	}
+}
+tweak_data.hud_icons.infamy_icon_5 = {
+	texture = "guis/textures/pd2/infamous_symbol2",
+	texture_rect = {
+		64,
+		4,
+		16,
+		16
+	}
+}

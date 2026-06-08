@@ -1144,7 +1144,6 @@ function InfamyTreeGui:update_detail_panels()
 				item_amount = item_amount + 1
 			end
 		end
-
 		local x_pos_increment = (desc_upgrade:w() + 100) / (item_amount + 1)
 		local x = x_pos_increment - 50
 		local icon_size = 64

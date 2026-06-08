@@ -2,8 +2,9 @@
 <mod>
 	<assets base_path="assets/">
 		<group>
-			<group name="guis/">
-				<file :name="textures/pd2/exp_ring_purple.texture"/>
+			<group name="guis/textures/pd2/">
+				<file :name="exp_ring_purple.texture"/>
+				<file :name="infamous_symbol2.texture"/>
 			</group>
 		</group>
 	</assets>
