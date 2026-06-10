@@ -1,14 +1,3 @@
-
-Hooks:Add("NetworkReceivedData", "INF4_receive_rank", function(sender, id, data)
-	if id == "INF4_rank_info" then
-		local peer_data = string.split(data, "|")
-		if peer_data[1] and peer_data[2] then
-			Global.INF4_rank_info = Global.INF4_rank_info or {}
-			Global.INF4_rank_info[peer_data[1]] = tonumber(peer_data[2])
-		end
-	end
-end)
-
 local sync_profile = ConnectionNetworkHandler.sync_profile
 function ConnectionNetworkHandler:sync_profile(...)
 	local data = {...}
@@ -34,3 +23,12 @@ function ConnectionNetworkHandler:lobby_info(...)
 
 	lobby_info(self, unpack(data))
 end
+
+Hooks:PostHook(ConnectionNetworkHandler, "send_chat_message", "INF4.ConnectionNetworkHandler.send_chat_message.PostHook", function(self, channel_id, message, sender)
+	local peer = self._verify_sender(sender)
+	if peer and message:find("INF4_rank_info") and channel_id == 3 then
+		local peer_data = string.split(message, "|")
+		Global.INF4_rank_info = Global.INF4_rank_info or {}
+		Global.INF4_rank_info[peer:ip()] = tonumber(peer_data[2])
+	end
+end)
