@@ -1,3 +1,5 @@
+dofile(ModPath .. "infamycardgui.lua")
+
 local data = MenuSceneManager.init
 function MenuSceneManager:init()
 	data(self)
