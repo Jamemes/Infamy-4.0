@@ -39,7 +39,7 @@ function InfamyCardGui:show_rank(rank)
 		rank = rank
 	}
 
-	if self._unit:damage() then
+	if alive(self._unit) and self._unit:damage() then
 		self._unit:damage():run_sequence_simple(tweak_data.infamy.infamy_1 and "enable_card_10" or "enable_card_blank")
 	end
 
