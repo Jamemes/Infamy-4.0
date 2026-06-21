@@ -26,7 +26,7 @@ end
 
 Hooks:PostHook(ConnectionNetworkHandler, "send_chat_message", "INF4.ConnectionNetworkHandler.send_chat_message.PostHook", function(self, channel_id, message, sender)
 	local peer = self._verify_sender(sender)
-	if peer and message:find("INF4_rank_info") and channel_id == 3 then
+	if peer and peer:ip() and message:find("INF4_rank_info") and channel_id == 3 then
 		local peer_data = string.split(message, "|")
 		Global.INF4_rank_info = Global.INF4_rank_info or {}
 		Global.INF4_rank_info[peer:ip()] = tonumber(peer_data[2])
